@@ -4,29 +4,27 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    OneToMany,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { MagentoOrder } from "./MagentoOrder";
+import { MagentoUser } from "./MagentoUser";
 
 @Entity()
 @ObjectType()
-export class MagentoUser extends BaseEntity {
+export class MagentoOrder extends BaseEntity {
     @PrimaryGeneratedColumn()
     @Field()
     id: number;
 
-    @Column({ unique: true })
+    @Column()
     @Field()
-    magentoId: number;
+    magentoOrderId: number;
 
-    @Column({ unique: true })
-    @Field()
-    email: string;
-
-    @OneToMany(() => MagentoOrder, (order) => order.magentoUser)
-    magentoOrders: MagentoOrder[];
+    @ManyToOne(() => MagentoUser, (user) => user.magentoOrders, {
+        cascade: true,
+    })
+    magentoUser: MagentoUser;
 
     @CreateDateColumn()
     createdAt: Date;

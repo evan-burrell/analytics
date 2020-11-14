@@ -7,6 +7,7 @@ import { createConnection } from "typeorm";
 import { MagentoUser } from "./entities/MagentoUser";
 import { MagentoUserResolver } from "./resolvers/MagentoUserResolver";
 import * as MagentoUsersController from "./controllers/MagentoUsersController";
+import * as MagentoOrdersController from "./controllers/MagentoOrdersController";
 import bodyParser from "body-parser";
 import { User } from "./entities/User";
 import { UserResolver } from "./resolvers/UserResolver";
@@ -14,6 +15,8 @@ import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import cors from "cors";
+import { MagentoOrder } from "./entities/MagentoOrder";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
 const main = async () => {
     createConnection({
@@ -23,7 +26,8 @@ const main = async () => {
         password: process.env.POSTGRES_PASSWORD,
         logging: true,
         synchronize: true,
-        entities: [MagentoUser, User],
+        entities: [MagentoOrder, MagentoUser, User],
+        namingStrategy: new SnakeNamingStrategy(),
     });
 
     const RedisStore = connectRedis(session);
@@ -70,6 +74,7 @@ const main = async () => {
     server.applyMiddleware({ app, cors: false });
 
     app.post("/magento/users", MagentoUsersController.store);
+    app.post("/magento/orders", MagentoOrdersController.store);
 
     app.listen({ port: process.env.PORT }, () =>
         console.log(

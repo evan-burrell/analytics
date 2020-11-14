@@ -1,4 +1,3 @@
-import { User } from "../entities/User";
 import {
     Arg,
     Ctx,
@@ -8,9 +7,9 @@ import {
     ObjectType,
     Query,
 } from "type-graphql";
-import { getRepository } from "typeorm";
 import argon2 from "argon2";
-import { Context } from "src/types";
+import { Context } from "../types";
+import { User } from "../entities/User";
 
 @ObjectType()
 class FieldError {
@@ -58,9 +57,7 @@ export class UserResolver {
             return null;
         }
 
-        const userRepository = getRepository(User);
-
-        return userRepository.findOne(req.session.userId);
+        return User.findOne(req.session.userId);
     }
 
     @Mutation(() => UserResponse)
@@ -68,8 +65,7 @@ export class UserResolver {
         @Arg("options") { email, password }: LoginInput,
         @Ctx() { req }: Context
     ): Promise<UserResponse> {
-        const userRepository = getRepository(User);
-        const user = await userRepository.findOne({
+        const user = await User.findOne({
             email,
         });
 
@@ -111,8 +107,7 @@ export class UserResolver {
         @Arg("options") { name, email, password }: RegisterInput,
         @Ctx() { req }: Context
     ): Promise<UserResponse> {
-        const userRepository = getRepository(User);
-        const foundUser = await userRepository.findOne({
+        const foundUser = await User.findOne({
             email,
         });
 
@@ -129,13 +124,13 @@ export class UserResolver {
 
         const hashedPassword = await argon2.hash(password);
 
-        const userToBeCreated = userRepository.create({
+        const userToBeCreated = User.create({
             name,
             email,
             password: hashedPassword,
         });
 
-        const user = await userRepository.save(userToBeCreated);
+        const user = await User.save(userToBeCreated);
 
         req.session.userId = user.id;
 
