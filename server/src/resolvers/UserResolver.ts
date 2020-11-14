@@ -30,6 +30,15 @@ class UserResponse {
 }
 
 @InputType()
+export class LoginInput {
+    @Field()
+    email: string;
+
+    @Field()
+    password: string;
+}
+
+@InputType()
 export class RegisterInput {
     @Field()
     name: string;
@@ -52,6 +61,49 @@ export class UserResolver {
         const userRepository = getRepository(User);
 
         return userRepository.findOne(req.session.userId);
+    }
+
+    @Mutation(() => UserResponse)
+    async login(
+        @Arg("options") { email, password }: LoginInput,
+        @Ctx() { req }: Context
+    ): Promise<UserResponse> {
+        const userRepository = getRepository(User);
+        const user = await userRepository.findOne({
+            email,
+        });
+
+        if (!user) {
+            return {
+                errors: [
+                    {
+                        field: "login",
+                        message:
+                            "Incorrect email or password. Please try again.",
+                    },
+                ],
+            };
+        }
+
+        const valid = await argon2.verify(user.password, password);
+
+        if (!valid) {
+            return {
+                errors: [
+                    {
+                        field: "login",
+                        message:
+                            "Incorrect email or password. Please try again.",
+                    },
+                ],
+            };
+        }
+
+        req.session.userId = user.id;
+
+        return {
+            user,
+        };
     }
 
     @Mutation(() => UserResponse)
