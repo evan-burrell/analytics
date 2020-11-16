@@ -24,3 +24,14 @@ it("login with a registered user", () => {
     cy.location("pathname").should("eq", "/");
     cy.getCookie("qid").should("exist");
 });
+
+it("login with a registered user, revisit login page and redirect home", () => {
+    cy.visit("/login");
+    cy.findByLabelText("Email Address").type(user.email);
+    cy.findByLabelText("Password").type(user.password);
+    cy.findByRole("button").click();
+    cy.location("pathname").should("eq", "/");
+    cy.getCookie("qid").should("exist");
+    cy.visit("/login");
+    cy.location("pathname").should("eq", "/");
+});

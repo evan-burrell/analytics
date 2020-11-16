@@ -1,7 +1,14 @@
-import { useLoginMutation } from "generated/graphql";
+import { ApolloQueryResult } from "@apollo/client";
+import {
+    MeDocument,
+    MeQuery,
+    useLoginMutation,
+} from "generated/graphql";
 import { Form, Text } from "informed";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
+import { initializeApollo } from "utils/apolloClient";
 
 type FormValues = {
     email: string;
@@ -59,6 +66,27 @@ const Login: React.FC = () => {
             </Form>
         </div>
     );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const apolloClient = initializeApollo({ ctx: context });
+
+    const response: ApolloQueryResult<MeQuery> = await apolloClient.query({
+        query: MeDocument,
+    });
+
+    if (response.data?.me?.id) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: {},
+    };
 };
 
 export default Login;

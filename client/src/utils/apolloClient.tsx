@@ -1,20 +1,35 @@
 import { useMemo } from "react";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import {
+    ApolloClient,
+    InMemoryCache,
+    NormalizedCacheObject,
+} from "@apollo/client";
 import merge from "deepmerge";
 
-let apolloClient: any;
+let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
-function createApolloClient() {
+function createApolloClient(ctx: any): ApolloClient<NormalizedCacheObject> {
     return new ApolloClient({
         ssrMode: typeof window === "undefined",
         uri: "http://localhost:4000/graphql", // Server URL (must be absolute)
         credentials: "include",
         cache: new InMemoryCache(),
+        ...(ctx && {
+            headers: {
+                cookie:
+                    (typeof window === "undefined"
+                        ? ctx?.req?.headers.cookie
+                        : undefined) || "",
+            },
+        }),
     });
 }
 
-export function initializeApollo(initialState: any = null) {
-    const _apolloClient = apolloClient ?? createApolloClient();
+export function initializeApollo({
+    initialState = null,
+    ctx = null,
+}: any = {}) {
+    const _apolloClient = apolloClient ?? createApolloClient(ctx);
 
     // If your page has Next.js data fetching methods that use Apollo Client, the initial state
     // gets hydrated here
@@ -36,7 +51,9 @@ export function initializeApollo(initialState: any = null) {
     return _apolloClient;
 }
 
-export function useApollo(initialState: any) {
-    const store = useMemo(() => initializeApollo(initialState), [initialState]);
-    return store;
+export function useApollo(initialState: any, ctx: any) {
+    return useMemo(() => initializeApollo({ initialState, ctx }), [
+        initialState,
+        ctx,
+    ]);
 }
