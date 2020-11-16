@@ -19,6 +19,8 @@ import { MagentoOrder } from "./entities/MagentoOrder";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { createMagentoOrderLoader } from "./utils/createMagentoOrderLoader";
 import { COOKIE_NAME } from "./constants";
+import { UserSettings } from "./entities/UserSettings";
+import { UserSettingsResolver } from "./resolvers/UserSettingsResolver";
 
 const main = async () => {
     createConnection({
@@ -28,7 +30,7 @@ const main = async () => {
         password: process.env.POSTGRES_PASSWORD,
         logging: true,
         synchronize: true,
-        entities: [MagentoOrder, MagentoUser, User],
+        entities: [MagentoOrder, MagentoUser, User, UserSettings],
         namingStrategy: new SnakeNamingStrategy(),
     });
 
@@ -63,7 +65,11 @@ const main = async () => {
 
     const server = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [MagentoUserResolver, UserResolver],
+            resolvers: [
+                MagentoUserResolver,
+                UserResolver,
+                UserSettingsResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({

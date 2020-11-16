@@ -4,9 +4,12 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
+import { UserSettings } from "./UserSettings";
 
 @Entity()
 @ObjectType()
@@ -25,6 +28,10 @@ export class User extends BaseEntity {
 
     @Column()
     password: string;
+
+    @OneToOne(() => UserSettings, { onDelete: "CASCADE" })
+    @JoinColumn()
+    userSettings: UserSettings;
 
     @CreateDateColumn()
     createdAt: Date;

@@ -1,0 +1,3 @@
+mutation generateApiKey {
+    generateApiKey
+}

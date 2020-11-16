@@ -43,6 +43,7 @@ export type Mutation = {
   login: UserResponse;
   register: UserResponse;
   logout: Scalars['Boolean'];
+  generateApiKey?: Maybe<Scalars['String']>;
 };
 
 
@@ -77,6 +78,14 @@ export type RegisterInput = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
+
+export type GenerateApiKeyMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GenerateApiKeyMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'generateApiKey'>
+);
 
 export type LoginMutationVariables = Exact<{
   options: LoginInput;
@@ -139,6 +148,35 @@ export type MeQuery = (
 );
 
 
+export const GenerateApiKeyDocument = gql`
+    mutation generateApiKey {
+  generateApiKey
+}
+    `;
+export type GenerateApiKeyMutationFn = Apollo.MutationFunction<GenerateApiKeyMutation, GenerateApiKeyMutationVariables>;
+
+/**
+ * __useGenerateApiKeyMutation__
+ *
+ * To run a mutation, you first call `useGenerateApiKeyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateApiKeyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateApiKeyMutation, { data, loading, error }] = useGenerateApiKeyMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGenerateApiKeyMutation(baseOptions?: Apollo.MutationHookOptions<GenerateApiKeyMutation, GenerateApiKeyMutationVariables>) {
+        return Apollo.useMutation<GenerateApiKeyMutation, GenerateApiKeyMutationVariables>(GenerateApiKeyDocument, baseOptions);
+      }
+export type GenerateApiKeyMutationHookResult = ReturnType<typeof useGenerateApiKeyMutation>;
+export type GenerateApiKeyMutationResult = Apollo.MutationResult<GenerateApiKeyMutation>;
+export type GenerateApiKeyMutationOptions = Apollo.BaseMutationOptions<GenerateApiKeyMutation, GenerateApiKeyMutationVariables>;
 export const LoginDocument = gql`
     mutation login($options: LoginInput!) {
   login(options: $options) {
