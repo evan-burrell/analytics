@@ -21,6 +21,9 @@ export class MagentoOrder extends BaseEntity {
     @Field()
     magentoOrderId: number;
 
+    @Column()
+    magentoUserId: number;
+
     @ManyToOne(() => MagentoUser, (user) => user.magentoOrders, {
         cascade: true,
     })

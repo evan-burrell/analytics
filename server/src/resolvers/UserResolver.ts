@@ -10,6 +10,7 @@ import {
 import argon2 from "argon2";
 import { Context } from "../types";
 import { User } from "../entities/User";
+import { COOKIE_NAME } from "../constants";
 
 @ObjectType()
 class FieldError {
@@ -51,8 +52,7 @@ export class RegisterInput {
 
 export class UserResolver {
     @Query(() => User, { nullable: true })
-    me(@Ctx() { req }: Context) {
-        // you are not logged in
+    async me(@Ctx() { req }: Context): Promise<User | null | undefined> {
         if (!req.session.userId) {
             return null;
         }
@@ -137,5 +137,20 @@ export class UserResolver {
         return {
             user,
         };
+    }
+
+    @Mutation(() => Boolean)
+    logout(@Ctx() { req, res }: Context) {
+        return new Promise((resolve) =>
+            req.session.destroy((err) => {
+                res.clearCookie(COOKIE_NAME);
+                if (err) {
+                    resolve(false);
+                    return;
+                }
+
+                resolve(true);
+            })
+        );
     }
 }

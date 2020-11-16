@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "gql:generate": "graphql-codegen --config codegen.yml",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "dependencies": {
     "@apollo/client": "3.1.1",

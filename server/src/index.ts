@@ -17,6 +17,8 @@ import connectRedis from "connect-redis";
 import cors from "cors";
 import { MagentoOrder } from "./entities/MagentoOrder";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import { createMagentoOrderLoader } from "./utils/createMagentoOrderLoader";
+import { COOKIE_NAME } from "./constants";
 
 const main = async () => {
     createConnection({
@@ -43,7 +45,7 @@ const main = async () => {
     );
     app.use(
         session({
-            name: "qid",
+            name: COOKIE_NAME,
             store: new RedisStore({
                 client: redis,
                 disableTouch: true,
@@ -68,6 +70,7 @@ const main = async () => {
             req,
             res,
             redis,
+            magentoOrderLoader: createMagentoOrderLoader(),
         }),
     });
 
